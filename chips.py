@@ -30,4 +30,4 @@ class Chips:
         for button in self.chip_buttons:
             if (pygame.math.Vector2(button)-pygame.math.Vector2(pos)).length() <= screen_height/25:
                 self.selected_chip = self.chip_values[self.chip_buttons.index(button)]
-                self.player.bet_amount += self.selected_chip
+                

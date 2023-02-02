@@ -26,9 +26,6 @@ while running:
             if event.button == 1:
                 pos = pygame.mouse.get_pos()
                 player.select_chip(pos)
-                if player.chips.selected_chip:
-                    player.place_bet(player.chips.selected_chip)
-                    print(player.bet_amount)
                 chips.handle_clicks(event.pos)
 
             player.select_chip(event.pos)            

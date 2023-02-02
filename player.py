@@ -10,8 +10,7 @@ class Player:
         self.bet_amount = 0
 
     def place_bet(self, bet_amount):
-        self.bet_amount = bet_amount
-        return bet_amount
+        pass
         
     def select_chip(self, pos):
         self.chips.handle_clicks(pos)

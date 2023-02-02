@@ -1,18 +1,6 @@
 class Dealer:
-    def __init__(self, min_bet, max_bet):
-        self.min_bet = min_bet
-        self.max_bet = max_bet
-
-    def set_table_limits(self, min_bet, max_bet):
-        self.min_bet = min_bet
-        self.max_bet = max_bet
-        
-    def check_bet(self,bet):
-        if bet<self.min_bet:
-            print("Bet is below the minimum limit of ",self.min_bet)
-            return False
-        elif bet>self.max_bet:
-            print("Bet is above the maximum limit of ",self.max_bet)
-            return False
-        else:
-            return True
+    def __init__(self):
+        # TO DO ::: Set dealer up to be able to add chips to the players bankroll
+        # TO DO ::: Set dealer up to be able to modify settings in game like Min/Max Bets, betting time limits, rolling time limits
+        # TO DO ::: Set dealer up to be able to turn off dice button and manually input dice rolls when rolling real dice.
+        pass 

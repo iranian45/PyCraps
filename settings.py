@@ -2,7 +2,7 @@ import pygame
 
 # Initizlize Pygame and set Screen info
 pygame.init()
-pygame.display.set_caption('DONT SUCK')
+pygame.display.set_caption('')
 info = pygame.display.Info()
 screen_width = 1400
 screen_height = 900
