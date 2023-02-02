@@ -6,6 +6,7 @@ from settings import *
 
 pygame.init()
 
+
 dice_images = []
 dice_rolling_images = []
 
@@ -21,6 +22,7 @@ die_image_4 = dice_images[3]
 die_image_5 = dice_images[4]
 die_image_6 = dice_images[5]
 
+
 class DiceButton:
     def __init__(self):
         self.rect = pygame.Rect(1275, 775, 115, 115)
@@ -33,6 +35,7 @@ class DiceButton:
         self.roll_num = 0
         self.dice_images = []
         self.rolling_images = []
+
         for i in range (1,9):
             self.rolling_image = pygame.image.load(f'Assets/animation/roll{i}.png')
             self.rolling_image = pygame.transform.scale(self.rolling_image, (screen_height*(1/7), screen_height*(1/7)))
@@ -43,6 +46,14 @@ class DiceButton:
             self.dice_images.append(self.dice_image)
         self.font = pygame.font.SysFont('Algerian', 20)
         self.rolls_to_display = {}
+        
+        self.point_val = None
+        self.point_on = False
+
+        self.puck_on = pygame.image.load('Assets/puck/puck_on.png')
+        self.puck_on = pygame.transform.scale(self.puck_on, (50,50))
+        self.puck_off = pygame.image.load('Assets/puck/puck_off.png')
+        self.puck_off = pygame.transform.scale(self.puck_off, (50,50))
     
     def create(self):
         pygame.draw.rect(screen, self.color, self.rect)
@@ -64,6 +75,8 @@ class DiceButton:
     def handle_clicks(self, pos):
         if self.rect.collidepoint(pos):
             self.roll_dice()
+            self.game_progress()
+    
 
     def roll_dice(self):
         x, y = screen_width//3, screen_height//3
@@ -74,14 +87,14 @@ class DiceButton:
             pygame.display.flip()
             pygame.time.wait(100)
             
-        roll1 = randint(1,6)
-        roll2 = randint(1,6)
-        roll_sum = roll1 + roll2
+        self.roll1 = randint(1,6)
+        self.roll2 = randint(1,6)
+        self.roll_sum = self.roll1 + self.roll2
         
-        print(f"Roll is: {roll1+roll2} Dice 1: {roll1}, Dice 2: {roll2}")
+        print(f"Roll is: {self.roll1+self.roll2} Dice 1: {self.roll1}, Dice 2: {self.roll2}")
 
         self.roll_num += 1
-        self.rolls[self.roll_num] = {"Dice 1": roll1, "Dice 2": roll2, "Sum": roll_sum}
+        self.rolls[self.roll_num] = {"Dice 1": self.roll1, "Dice 2": self.roll2, "Sum": self.roll_sum}
 
         if len(self.rolls) > 10:
             self.rolls_to_display = dict(list(self.rolls.items())[-10:])
@@ -90,4 +103,42 @@ class DiceButton:
 
         pygame.display.update()
     
+    def game_progress(self):
+        if self.point_on == False:
+            
+            if self.roll_sum in [4, 5, 6, 8, 9, 10]:
+                self.point_val = self.roll_sum
+                self.point_on = True
+                print(f"{self.point_val} The point is {self.roll_sum}")
+
+            elif self.roll_sum in [7, 11]:
+
+                print(f"{self.roll_sum} Front Line Winner{self.point_val}" )
+            else:
+                print(f"{self.roll_sum} Craps Pay the Don'ts{self.point_val} ")
+
+        elif self.point_on == True:
+            if self.roll_sum in [4, 5, 6, 8, 9, 10]:
+                print(f"{self.roll_sum} Way to Go {self.point_val} ")
+            elif self.roll_sum in [2, 3, 11, 12]:
+                print(f"{self.roll_sum} Pay the horns{self.point_val} ")
+            else:
+                self.point_on = False
+                self.point_val = None
+                print(f"{self.roll_sum} Out, Next Shooter {self.point_val} ")
     
+    def puck_movement(self):
+        if self.point_on == False:
+            screen.blit(self.puck_off, (1158, 245))
+        elif self.point_on == True and self.point_val == 4:
+            screen.blit(self.puck_on, (10, 345))
+        elif self.point_on == True and self.point_val == 5:
+            screen.blit(self.puck_on, (200, 345))
+        elif self.point_on == True and self.point_val == 6:
+            screen.blit(self.puck_on, (390, 345))
+        elif self.point_on == True and self.point_val == 8:
+            screen.blit(self.puck_on, (580, 345))
+        elif self.point_on == True and self.point_val == 9:
+            screen.blit(self.puck_on, (770, 345))
+        elif self.point_on == True and self.point_val == 10:
+            screen.blit(self.puck_on, (960, 345))

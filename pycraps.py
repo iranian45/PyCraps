@@ -7,6 +7,7 @@ from dice import *
 from player import *
 
 
+
 # Create an instance of the CrapsTable class
 table = CrapsTable(screen)  
 dice_button = DiceButton()
@@ -25,11 +26,8 @@ while running:
         if event.type == pygame.MOUSEBUTTONDOWN:
             if event.button == 1:
                 pos = pygame.mouse.get_pos()
-                player.select_chip(pos)
                 chips.handle_clicks(event.pos)
-
-            player.select_chip(event.pos)            
-            dice_button.handle_clicks(event.pos)
+                dice_button.handle_clicks(event.pos)
     
     # Clear the screen
     screen.fill(dark_grey)
@@ -39,6 +37,7 @@ while running:
     table.draw_table()
     chips.create()
     dice_button.create()
+    dice_button.puck_movement()
     
     
 
