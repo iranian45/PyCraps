@@ -40,7 +40,7 @@ class DiceButton:
             self.dice_image = pygame.image.load(f'Assets/dice/{i}.png')
             self.dice_image = pygame.transform.scale(self.dice_image, (screen_height*(1/14)*.5, screen_height*(1/14)*.5))
             self.dice_images.append(self.dice_image)
-        self.font = pygame.font.SysFont('Algerian', 20)
+        self.font = pygame.font.Font("Assets/font/ALGER.TTF", 20)
         self.rolls_to_display = {}
         self.point_val = None
         self.point_on = False
@@ -88,6 +88,7 @@ class DiceButton:
         else:
             self.rolls_to_display = self.rolls
         pygame.display.update()
+        
     
     def game_progress(self):
         if self.point_on == False:  

@@ -48,32 +48,12 @@ class CrapsTable:
             'pass_line': 0
         }
         
-    def draw_table(self):
-        
+    def draw_table(self):        
         for point, rect in self.point_rect_dict.items():
             pygame.draw.rect(self.screen, light_grey, rect, 2)      
-    
-    def get_betting_point(self, x, y):
-        for point, rect in self.point_rect_dict.items():
-            if rect.collidepoint(x, y):
-                return point
-        return None
-    
-    def place_bet(self, point, amount):
-        self.betting_amounts[point] += amount
-
-    def remove_bet(self, point, amount):
-        self.betting_amounts[point] -= amount
-
-    def display_betting_amounts(self):
-        font = pygame.font.SysFont('Algerian', 20)
-        for point, amount in self.betting_amounts.items():
-            # text = font.render(str(amount), True, (255, 255, 255))
-            # self.screen.blit(text, (rect.x, rect.y))
-            pass
 
     def render_text_center(self, screen, text, font, size, rect, color, x_offset=0, y_offset=0):
-        font = pygame.font.SysFont(font, size)
+        font = pygame.font.Font("Assets/font/"+font, size)
         text_surface = font.render(text, True, color)
         text_rect = text_surface.get_rect()
         text_rect.center = (rect.center[0] + x_offset, rect.center[1] + y_offset)
@@ -98,73 +78,73 @@ class CrapsTable:
                 ("BUY", f"{point}_buy"),
             ]
             for text, value in text_values:
-                self.render_text_center(screen, text, 'Algerian', 27, self.point_rect_dict[value], gold)
+                self.render_text_center(screen, text, 'ALGER.TTF', 27, self.point_rect_dict[value], gold)
         
-        self.render_text_center(screen, '30 TO 1', 'Algerian', 20, self.point_rect_dict['horn_two'], white, y_offset=(self.point_rect_dict['horn_two'].bottom-self.point_rect_dict['horn_two'].centery)/2)
+        self.render_text_center(screen, '30 TO 1', 'ALGER.TTF', 20, self.point_rect_dict['horn_two'], white, y_offset=(self.point_rect_dict['horn_two'].bottom-self.point_rect_dict['horn_two'].centery)/2)
         screen.blit(die_image_1, (self.point_rect_dict['horn_two'].centerx-34,self.point_rect_dict['horn_two'].centery-24))
         screen.blit(die_image_1, (self.point_rect_dict['horn_two'].centerx ,self.point_rect_dict['horn_two'].centery-24))
 
-        self.render_text_center(screen, '15 TO 1', 'Algerian', 20, self.point_rect_dict['horn_three'], white, y_offset=(self.point_rect_dict['horn_three'].bottom-self.point_rect_dict['horn_three'].centery)/2)
+        self.render_text_center(screen, '15 TO 1', 'ALGER.TTF', 20, self.point_rect_dict['horn_three'], white, y_offset=(self.point_rect_dict['horn_three'].bottom-self.point_rect_dict['horn_three'].centery)/2)
         screen.blit(die_image_1, (self.point_rect_dict['horn_three'].centerx-34,self.point_rect_dict['horn_three'].centery-24))
         screen.blit(die_image_2, (self.point_rect_dict['horn_three'].centerx ,self.point_rect_dict['horn_three'].centery-24))
 
-        self.render_text_center(screen, '7 TO 1', 'Algerian', 20, self.point_rect_dict['hard_four'], white, y_offset=(self.point_rect_dict['hard_four'].bottom-self.point_rect_dict['hard_four'].centery)/2)
+        self.render_text_center(screen, '7 TO 1', 'ALGER.TTF', 20, self.point_rect_dict['hard_four'], white, y_offset=(self.point_rect_dict['hard_four'].bottom-self.point_rect_dict['hard_four'].centery)/2)
         screen.blit(die_image_2, (self.point_rect_dict['hard_four'].centerx-34,self.point_rect_dict['hard_four'].centery-24))
         screen.blit(die_image_2, (self.point_rect_dict['hard_four'].centerx ,self.point_rect_dict['hard_four'].centery-24))
 
-        self.render_text_center(screen, '9 TO 1', 'Algerian', 20, self.point_rect_dict['hard_six'], white, y_offset=(self.point_rect_dict['hard_six'].bottom-self.point_rect_dict['hard_six'].centery)/2)
+        self.render_text_center(screen, '9 TO 1', 'ALGER.TTF', 20, self.point_rect_dict['hard_six'], white, y_offset=(self.point_rect_dict['hard_six'].bottom-self.point_rect_dict['hard_six'].centery)/2)
         screen.blit(die_image_3, (self.point_rect_dict['hard_six'].centerx-34,self.point_rect_dict['hard_six'].centery-24))
         screen.blit(die_image_3, (self.point_rect_dict['hard_six'].centerx ,self.point_rect_dict['hard_six'].centery-24))
 
-        self.render_text_center(screen, '9 TO 1', 'Algerian', 20, self.point_rect_dict['hard_eight'], white, y_offset=(self.point_rect_dict['hard_eight'].bottom-self.point_rect_dict['hard_eight'].centery)/2)
+        self.render_text_center(screen, '9 TO 1', 'ALGER.TTF', 20, self.point_rect_dict['hard_eight'], white, y_offset=(self.point_rect_dict['hard_eight'].bottom-self.point_rect_dict['hard_eight'].centery)/2)
         screen.blit(die_image_4, (self.point_rect_dict['hard_eight'].centerx-34,self.point_rect_dict['hard_eight'].centery-24))
         screen.blit(die_image_4, (self.point_rect_dict['hard_eight'].centerx ,self.point_rect_dict['hard_eight'].centery-24))
 
-        self.render_text_center(screen, '7 TO 1', 'Algerian', 20, self.point_rect_dict['hard_ten'], white, y_offset=(self.point_rect_dict['hard_ten'].bottom-self.point_rect_dict['hard_ten'].centery)/2)
+        self.render_text_center(screen, '7 TO 1', 'ALGER.TTF', 20, self.point_rect_dict['hard_ten'], white, y_offset=(self.point_rect_dict['hard_ten'].bottom-self.point_rect_dict['hard_ten'].centery)/2)
         screen.blit(die_image_5, (self.point_rect_dict['hard_ten'].centerx-34,self.point_rect_dict['hard_ten'].centery-24))
         screen.blit(die_image_5, (self.point_rect_dict['hard_ten'].centerx ,self.point_rect_dict['hard_ten'].centery-24))
 
-        self.render_text_center(screen, '15 TO 1', 'Algerian', 20, self.point_rect_dict['horn_eleven'], white, y_offset=(self.point_rect_dict['horn_eleven'].bottom-self.point_rect_dict['horn_eleven'].centery)/2)
+        self.render_text_center(screen, '15 TO 1', 'ALGER.TTF', 20, self.point_rect_dict['horn_eleven'], white, y_offset=(self.point_rect_dict['horn_eleven'].bottom-self.point_rect_dict['horn_eleven'].centery)/2)
         screen.blit(die_image_5, (self.point_rect_dict['horn_eleven'].centerx-34,self.point_rect_dict['horn_eleven'].centery-24))
         screen.blit(die_image_6, (self.point_rect_dict['horn_eleven'].centerx ,self.point_rect_dict['horn_eleven'].centery-24))
 
-        self.render_text_center(screen, '30 TO 1', 'Algerian', 20, self.point_rect_dict['horn_twelve'], white, y_offset=(self.point_rect_dict['horn_twelve'].bottom-self.point_rect_dict['horn_twelve'].centery)/2)
+        self.render_text_center(screen, '30 TO 1', 'ALGER.TTF', 20, self.point_rect_dict['horn_twelve'], white, y_offset=(self.point_rect_dict['horn_twelve'].bottom-self.point_rect_dict['horn_twelve'].centery)/2)
         screen.blit(die_image_6, (self.point_rect_dict['horn_twelve'].centerx-34,self.point_rect_dict['horn_twelve'].centery-24))
         screen.blit(die_image_6, (self.point_rect_dict['horn_twelve'].centerx ,self.point_rect_dict['horn_twelve'].centery-24))
 
-        self.render_text_center(screen, '4 TO 1', 'Algerian', 20, self.point_rect_dict['any_seven'], white, x_offset=(self.point_rect_dict['any_seven'].right-self.point_rect_dict['any_seven'].centerx)/2+20)
-        self.render_text_center(screen, '4 TO 1', 'Algerian', 20, self.point_rect_dict['any_seven'], white, x_offset=(self.point_rect_dict['any_seven'].left-self.point_rect_dict['any_seven'].centerx)/2-20)
-        self.render_text_center(screen, 'SEVEN', 'Algerian', 30, self.point_rect_dict['any_seven'], deep_red)
+        self.render_text_center(screen, '4 TO 1', 'ALGER.TTF', 20, self.point_rect_dict['any_seven'], white, x_offset=(self.point_rect_dict['any_seven'].right-self.point_rect_dict['any_seven'].centerx)/2+20)
+        self.render_text_center(screen, '4 TO 1', 'ALGER.TTF', 20, self.point_rect_dict['any_seven'], white, x_offset=(self.point_rect_dict['any_seven'].left-self.point_rect_dict['any_seven'].centerx)/2-20)
+        self.render_text_center(screen, 'SEVEN', 'ALGER.TTF', 30, self.point_rect_dict['any_seven'], deep_red)
 
-        self.render_text_center(screen, "DON'T", 'Algerian', 20, self.point_rect_dict['dont_come'], deep_red,y_offset=-50)
-        self.render_text_center(screen, "COME", 'Algerian', 20, self.point_rect_dict['dont_come'], deep_red,y_offset=-30)
-        self.render_text_center(screen, "BAR", 'Algerian', 20, self.point_rect_dict['dont_come'], deep_red,y_offset=-10)
+        self.render_text_center(screen, "DON'T", 'ALGER.TTF', 20, self.point_rect_dict['dont_come'], deep_red,y_offset=-50)
+        self.render_text_center(screen, "COME", 'ALGER.TTF', 20, self.point_rect_dict['dont_come'], deep_red,y_offset=-30)
+        self.render_text_center(screen, "BAR", 'ALGER.TTF', 20, self.point_rect_dict['dont_come'], deep_red,y_offset=-10)
         screen.blit(die_image_6, (self.point_rect_dict['dont_come'].left,self.point_rect_dict['dont_come'].centery))
         screen.blit(die_image_6, (self.point_rect_dict['dont_come'].left+die_image_6.get_rect().width,self.point_rect_dict['dont_come'].centery))
 
-        self.render_text_center(screen, '7 TO 1', 'Algerian', 20, self.point_rect_dict['any_craps'], white, x_offset=(self.point_rect_dict['any_craps'].right-self.point_rect_dict['any_craps'].centerx)/2+20)
-        self.render_text_center(screen, '7 TO 1', 'Algerian', 20, self.point_rect_dict['any_craps'], white, x_offset=(self.point_rect_dict['any_craps'].left-self.point_rect_dict['any_craps'].centerx)/2-20)
-        self.render_text_center(screen, 'CRAPS', 'Algerian', 30, self.point_rect_dict['any_craps'], deep_red)
+        self.render_text_center(screen, '7 TO 1', 'ALGER.TTF', 20, self.point_rect_dict['any_craps'], white, x_offset=(self.point_rect_dict['any_craps'].right-self.point_rect_dict['any_craps'].centerx)/2+20)
+        self.render_text_center(screen, '7 TO 1', 'ALGER.TTF', 20, self.point_rect_dict['any_craps'], white, x_offset=(self.point_rect_dict['any_craps'].left-self.point_rect_dict['any_craps'].centerx)/2-20)
+        self.render_text_center(screen, 'CRAPS', 'ALGER.TTF', 30, self.point_rect_dict['any_craps'], deep_red)
 
-        self.render_text_center(screen, 'COME', 'Algerian', 80, self.point_rect_dict['come'], deep_red)
+        self.render_text_center(screen, 'COME', 'ALGER.TTF', 80, self.point_rect_dict['come'], deep_red)
 
-        self.render_text_center(screen, "DON'T PASS BAR", 'Algerian', 60, self.point_rect_dict['dont_pass_line'], deep_red, x_offset= -30)
+        self.render_text_center(screen, "DON'T PASS BAR", 'ALGER.TTF', 60, self.point_rect_dict['dont_pass_line'], deep_red, x_offset= -30)
         screen.blit(die_image_6, (self.point_rect_dict['dont_pass_line'].right-die_image_6.get_rect().width*2-10,self.point_rect_dict['dont_pass_line'].centery-die_image_6.get_rect().height/2))
         screen.blit(die_image_6, (self.point_rect_dict['dont_pass_line'].right-die_image_6.get_rect().width-5,self.point_rect_dict['dont_pass_line'].centery-die_image_6.get_rect().height/2))
 
-        self.render_text_center(screen, "PASS LINE", 'Algerian', 80, self.point_rect_dict['pass_line'], white)
+        self.render_text_center(screen, "PASS LINE", 'ALGER.TTF', 80, self.point_rect_dict['pass_line'], white)
 
-        self.render_text_center(screen, "2", 'Algerian', 30, self.point_rect_dict['field'], gold, x_offset=-250, y_offset= 5)
+        self.render_text_center(screen, "2", 'ALGER.TTF', 30, self.point_rect_dict['field'], gold, x_offset=-250, y_offset= 5)
         pygame.draw.circle(screen, light_grey,(self.point_rect_dict['field'].centerx-250, self.point_rect_dict['field'].centery+5),20,2)
-        self.render_text_center(screen, "PAYS DOUBLE", 'Algerian', 15, self.point_rect_dict['field'], gold, x_offset=-250, y_offset= -22)
-        self.render_text_center(screen, "3", 'Algerian', 30, self.point_rect_dict['field'], gold, x_offset=-150, y_offset= -15)
-        self.render_text_center(screen, "4", 'Algerian', 30, self.point_rect_dict['field'], gold, x_offset=-50, y_offset= -15)
-        self.render_text_center(screen, "9", 'Algerian', 30, self.point_rect_dict['field'], gold, y_offset= -15)
-        self.render_text_center(screen, "FIELD", 'Algerian', 30, self.point_rect_dict['field'], white, y_offset= 15)
-        self.render_text_center(screen, "10", 'Algerian', 30, self.point_rect_dict['field'], gold, x_offset=50, y_offset= -15)
-        self.render_text_center(screen, "11", 'Algerian', 30, self.point_rect_dict['field'], gold, x_offset=150, y_offset= -15)
-        self.render_text_center(screen, "12", 'Algerian', 30, self.point_rect_dict['field'], gold, x_offset=250, y_offset= 5)
+        self.render_text_center(screen, "PAYS DOUBLE", 'ALGER.TTF', 15, self.point_rect_dict['field'], gold, x_offset=-250, y_offset= -22)
+        self.render_text_center(screen, "3", 'ALGER.TTF', 30, self.point_rect_dict['field'], gold, x_offset=-150, y_offset= -15)
+        self.render_text_center(screen, "4", 'ALGER.TTF', 30, self.point_rect_dict['field'], gold, x_offset=-50, y_offset= -15)
+        self.render_text_center(screen, "9", 'ALGER.TTF', 30, self.point_rect_dict['field'], gold, y_offset= -15)
+        self.render_text_center(screen, "FIELD", 'ALGER.TTF', 30, self.point_rect_dict['field'], white, y_offset= 15)
+        self.render_text_center(screen, "10", 'ALGER.TTF', 30, self.point_rect_dict['field'], gold, x_offset=50, y_offset= -15)
+        self.render_text_center(screen, "11", 'ALGER.TTF', 30, self.point_rect_dict['field'], gold, x_offset=150, y_offset= -15)
+        self.render_text_center(screen, "12", 'ALGER.TTF', 30, self.point_rect_dict['field'], gold, x_offset=250, y_offset= 5)
         pygame.draw.circle(screen, light_grey,(self.point_rect_dict['field'].centerx+250, self.point_rect_dict['field'].centery+5),20,2)
-        self.render_text_center(screen, "PAYS TRIPLE", 'Algerian', 15, self.point_rect_dict['field'], gold, x_offset=+250, y_offset= -22)
+        self.render_text_center(screen, "PAYS TRIPLE", 'ALGER.TTF', 15, self.point_rect_dict['field'], gold, x_offset=+250, y_offset= -22)
         
 
