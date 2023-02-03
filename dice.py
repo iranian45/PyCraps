@@ -1,11 +1,9 @@
-from matplotlib import pyplot as plt
 import pandas as pd
 import pygame
 from random import randint
 from settings import *
 
 pygame.init()
-
 
 dice_images = []
 dice_rolling_images = []
@@ -22,7 +20,6 @@ die_image_4 = dice_images[3]
 die_image_5 = dice_images[4]
 die_image_6 = dice_images[5]
 
-
 class DiceButton:
     def __init__(self):
         self.rect = pygame.Rect(1275, 775, 115, 115)
@@ -35,7 +32,6 @@ class DiceButton:
         self.roll_num = 0
         self.dice_images = []
         self.rolling_images = []
-
         for i in range (1,9):
             self.rolling_image = pygame.image.load(f'Assets/animation/roll{i}.png')
             self.rolling_image = pygame.transform.scale(self.rolling_image, (screen_height*(1/7), screen_height*(1/7)))
@@ -46,10 +42,8 @@ class DiceButton:
             self.dice_images.append(self.dice_image)
         self.font = pygame.font.SysFont('Algerian', 20)
         self.rolls_to_display = {}
-        
         self.point_val = None
         self.point_on = False
-
         self.puck_on = pygame.image.load('Assets/puck/puck_on.png')
         self.puck_on = pygame.transform.scale(self.puck_on, (50,50))
         self.puck_off = pygame.image.load('Assets/puck/puck_off.png')
@@ -77,55 +71,47 @@ class DiceButton:
             self.roll_dice()
             self.game_progress()
     
-
     def roll_dice(self):
         x, y = screen_width//3, screen_height//3
         for i in self.rolling_images:
-            
             screen.blit(i, (x, y))
             screen.blit(i, (x-screen_height*(1/14),y))
             pygame.display.flip()
             pygame.time.wait(100)
-            
         self.roll1 = randint(1,6)
         self.roll2 = randint(1,6)
         self.roll_sum = self.roll1 + self.roll2
-        
-        print(f"Roll is: {self.roll1+self.roll2} Dice 1: {self.roll1}, Dice 2: {self.roll2}")
-
         self.roll_num += 1
         self.rolls[self.roll_num] = {"Dice 1": self.roll1, "Dice 2": self.roll2, "Sum": self.roll_sum}
-
         if len(self.rolls) > 10:
             self.rolls_to_display = dict(list(self.rolls.items())[-10:])
         else:
             self.rolls_to_display = self.rolls
-
         pygame.display.update()
     
     def game_progress(self):
-        if self.point_on == False:
-            
+        if self.point_on == False:  
             if self.roll_sum in [4, 5, 6, 8, 9, 10]:
+                self.roll_audio()
                 self.point_val = self.roll_sum
-                self.point_on = True
-                print(f"{self.point_val} The point is {self.roll_sum}")
-
+                self.point_on = True                
             elif self.roll_sum in [7, 11]:
-
-                print(f"{self.roll_sum} Front Line Winner{self.point_val}" )
+                self.roll_audio()
             else:
-                print(f"{self.roll_sum} Craps Pay the Don'ts{self.point_val} ")
-
+                self.roll_audio()
         elif self.point_on == True:
-            if self.roll_sum in [4, 5, 6, 8, 9, 10]:
-                print(f"{self.roll_sum} Way to Go {self.point_val} ")
-            elif self.roll_sum in [2, 3, 11, 12]:
-                print(f"{self.roll_sum} Pay the horns{self.point_val} ")
-            else:
+            if self.roll_sum == self.point_val:
+                self.roll_audio()
                 self.point_on = False
                 self.point_val = None
-                print(f"{self.roll_sum} Out, Next Shooter {self.point_val} ")
+            elif self.roll_sum in [4, 5, 6, 8, 9, 10]:
+                self.roll_audio()
+            elif self.roll_sum in [2, 3, 11, 12]:
+                self.roll_audio()
+            else:
+                self.roll_audio()
+                self.point_on = False
+                self.point_val = None
     
     def puck_movement(self):
         if self.point_on == False:
@@ -142,3 +128,36 @@ class DiceButton:
             screen.blit(self.puck_on, (770, 345))
         elif self.point_on == True and self.point_val == 10:
             screen.blit(self.puck_on, (960, 345))
+
+    def roll_audio(self):
+        self.off_sounds = {
+            2: "Assets/audio/2off.ogg",
+            3: "Assets/audio/3off.ogg",
+            4: "Assets/audio/4easyoff.ogg" if self.roll1 in [1, 3] else "Assets/audio/4hardoff.ogg",
+            5: "Assets/audio/5off.ogg",
+            6: "Assets/audio/6easyoff.ogg" if self.roll1 in [1, 2, 4] else "Assets/audio/6hardoff.ogg",
+            7: "Assets/audio/7off.ogg",
+            8: "Assets/audio/8easyoff.ogg" if self.roll1 in [2, 3, 5, 6] else "Assets/audio/8hardoff.ogg",
+            9: "Assets/audio/9off.ogg",
+            10: "Assets/audio/10easyoff.ogg" if self.roll1 != 5 else "Assets/audio/10hardoff.ogg",
+            11: "Assets/audio/11off.ogg",
+            12: "Assets/audio/12off.ogg"
+        }
+        self.on_sounds = {
+            2: "Assets/audio/2on.ogg",
+            3: "Assets/audio/3on.ogg",
+            4: "Assets/audio/4easywinner.ogg" if self.point_val == 4 and self.roll1 in [1, 3] else "Assets/audio/4easyon.ogg" if self.roll1 in [1, 3] else "Assets/audio/4hardwinner.ogg" if self.point_val == 4 else "Assets/audio/4hardon.ogg",
+            5: "Assets/audio/5winner.ogg" if self.point_val == 5 else "Assets/audio/5on.ogg",
+            6: "Assets/audio/6easywinner.ogg" if self.point_val == 6 and self.roll1 in [1, 2, 4, 5] else "Assets/audio/6easyon.ogg" if self.roll1 in [1, 2, 4] else "Assets/audio/6hardwinner.ogg" if self.point_val == 6 else "Assets/audio/6hardon.ogg",
+            7: "Assets/audio/7out.ogg",
+            8: "Assets/audio/8easywinner.ogg" if self.point_val == 8 and self.roll1 in [2, 3, 5, 6] else "Assets/audio/8easyon.ogg" if self.roll1 in [2, 3, 5, 6] else "Assets/audio/8hardwinner.ogg" if self.point_val == 8 else "Assets/audio/8hardon.ogg",
+            9: "Assets/audio/9winner.ogg" if self.point_val == 9 else "Assets/audio/9on.ogg",
+            10: "Assets/audio/10easywinner.ogg" if self.point_val == 10 and self.roll1 in [4, 6] else "Assets/audio/10easyon.ogg" if self.roll1 in [4, 6] else "Assets/audio/10hardwinner.ogg" if self.point_val == 10 else "Assets/audio/10hardon.ogg",
+            11: "Assets/audio/11on.ogg",
+            12: "Assets/audio/12on.ogg",
+        }
+        if self.point_on:
+            self.sound = pygame.mixer.Sound(self.on_sounds[self.roll_sum])
+        else:
+            self.sound = pygame.mixer.Sound(self.off_sounds[self.roll_sum])
+        self.sound.play()

@@ -1,12 +1,9 @@
 import pygame
-
 from crapstable import *
 from settings import *
 from chips import *
 from dice import *
 from player import *
-
-
 
 # Create an instance of the CrapsTable class
 table = CrapsTable(screen)  
@@ -39,8 +36,6 @@ while running:
     dice_button.create()
     dice_button.puck_movement()
     
-    
-
     # Update the screen
     pygame.display.update()
 
