@@ -16,6 +16,7 @@ class Chips:
             self.chip_buttons.append((x, y))
 
     def create(self):
+    # draw chip buttons on the screen and highlight selected chip in yellow
         for button in self.chip_buttons:
             value = self.chip_values[self.chip_buttons.index(button)]
             color = self.chip_colors[value]
@@ -29,6 +30,7 @@ class Chips:
             screen.blit(text_surface, text_rect)
 
     def handle_clicks(self, pos):
+    # handles the clicking of the chip and selecting chip
         for button in self.chip_buttons:
             if (pygame.math.Vector2(button) - pygame.math.Vector2(pos)).length() <= screen_height / 25:
                 self.selected_chip = self.chip_values[self.chip_buttons.index(button)]

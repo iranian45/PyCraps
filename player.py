@@ -9,13 +9,6 @@ class Player:
         self.bankroll = 500
         self.bet_amount = 0
 
-    def handle_clicks(self, pos):
-        for button in self.chip_buttons:
-            if (pygame.math.Vector2(button) - pygame.math.Vector2(pos)).length() <= screen_height / 25:
-                self.selected_chip = self.chip_values[self.chip_buttons.index(button)]
-                print(self.selected_chip)
-                self.bet_chip = self.selected_chip
-
     def handle_betting(self, pos):          
             for point, rect in self.table.point_rect_dict.items():
                 if rect.collidepoint(pos):
