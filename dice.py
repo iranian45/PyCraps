@@ -131,30 +131,30 @@ class DiceButton:
 
     def roll_audio(self):
         self.off_sounds = {
-            2: "Assets/audio/2off.ogg",
-            3: "Assets/audio/3off.ogg",
-            4: "Assets/audio/4easyoff.ogg" if self.roll1 in [1, 3] else "Assets/audio/4hardoff.ogg",
-            5: "Assets/audio/5off.ogg",
-            6: "Assets/audio/6easyoff.ogg" if self.roll1 in [1, 2, 4] else "Assets/audio/6hardoff.ogg",
-            7: "Assets/audio/7off.ogg",
-            8: "Assets/audio/8easyoff.ogg" if self.roll1 in [2, 3, 5, 6] else "Assets/audio/8hardoff.ogg",
-            9: "Assets/audio/9off.ogg",
-            10: "Assets/audio/10easyoff.ogg" if self.roll1 != 5 else "Assets/audio/10hardoff.ogg",
-            11: "Assets/audio/11off.ogg",
-            12: "Assets/audio/12off.ogg"
+            2: "Assets/audio/2off.wav",
+            3: "Assets/audio/3off.wav",
+            4: "Assets/audio/4easyoff.wav" if self.roll1 in [1, 3] else "Assets/audio/4hardoff.wav",
+            5: "Assets/audio/5off.wav",
+            6: "Assets/audio/6easyoff.wav" if self.roll1 in [1, 2, 4] else "Assets/audio/6hardoff.wav",
+            7: "Assets/audio/7off.wav",
+            8: "Assets/audio/8easyoff.wav" if self.roll1 in [2, 3, 5, 6] else "Assets/audio/8hardoff.wav",
+            9: "Assets/audio/9off.wav",
+            10: "Assets/audio/10easyoff.wav" if self.roll1 != 5 else "Assets/audio/10hardoff.wav",
+            11: "Assets/audio/11off.wav",
+            12: "Assets/audio/12off.wav"
         }
         self.on_sounds = {
-            2: "Assets/audio/2on.ogg",
-            3: "Assets/audio/3on.ogg",
-            4: "Assets/audio/4easywinner.ogg" if self.point_val == 4 and self.roll1 in [1, 3] else "Assets/audio/4easyon.ogg" if self.roll1 in [1, 3] else "Assets/audio/4hardwinner.ogg" if self.point_val == 4 else "Assets/audio/4hardon.ogg",
-            5: "Assets/audio/5winner.ogg" if self.point_val == 5 else "Assets/audio/5on.ogg",
-            6: "Assets/audio/6easywinner.ogg" if self.point_val == 6 and self.roll1 in [1, 2, 4, 5] else "Assets/audio/6easyon.ogg" if self.roll1 in [1, 2, 4] else "Assets/audio/6hardwinner.ogg" if self.point_val == 6 else "Assets/audio/6hardon.ogg",
-            7: "Assets/audio/7out.ogg",
-            8: "Assets/audio/8easywinner.ogg" if self.point_val == 8 and self.roll1 in [2, 3, 5, 6] else "Assets/audio/8easyon.ogg" if self.roll1 in [2, 3, 5, 6] else "Assets/audio/8hardwinner.ogg" if self.point_val == 8 else "Assets/audio/8hardon.ogg",
-            9: "Assets/audio/9winner.ogg" if self.point_val == 9 else "Assets/audio/9on.ogg",
-            10: "Assets/audio/10easywinner.ogg" if self.point_val == 10 and self.roll1 in [4, 6] else "Assets/audio/10easyon.ogg" if self.roll1 in [4, 6] else "Assets/audio/10hardwinner.ogg" if self.point_val == 10 else "Assets/audio/10hardon.ogg",
-            11: "Assets/audio/11on.ogg",
-            12: "Assets/audio/12on.ogg",
+            2: "Assets/audio/2on.wav",
+            3: "Assets/audio/3on.wav",
+            4: "Assets/audio/4easywinner.wav" if self.point_val == 4 and self.roll1 in [1, 3] else "Assets/audio/4easyon.wav" if self.roll1 in [1, 3] else "Assets/audio/4hardwinner.wav" if self.point_val == 4 else "Assets/audio/4hardon.wav",
+            5: "Assets/audio/5winner.wav" if self.point_val == 5 else "Assets/audio/5on.wav",
+            6: "Assets/audio/6easywinner.wav" if self.point_val == 6 and self.roll1 in [1, 2, 4, 5] else "Assets/audio/6easyon.wav" if self.roll1 in [1, 2, 4] else "Assets/audio/6hardwinner.wav" if self.point_val == 6 else "Assets/audio/6hardon.wav",
+            7: "Assets/audio/7out.wav",
+            8: "Assets/audio/8easywinner.wav" if self.point_val == 8 and self.roll1 in [2, 3, 5, 6] else "Assets/audio/8easyon.wav" if self.roll1 in [2, 3, 5, 6] else "Assets/audio/8hardwinner.wav" if self.point_val == 8 else "Assets/audio/8hardon.wav",
+            9: "Assets/audio/9winner.wav" if self.point_val == 9 else "Assets/audio/9on.wav",
+            10: "Assets/audio/10easywinner.wav" if self.point_val == 10 and self.roll1 in [4, 6] else "Assets/audio/10easyon.wav" if self.roll1 in [4, 6] else "Assets/audio/10hardwinner.wav" if self.point_val == 10 else "Assets/audio/10hardon.wav",
+            11: "Assets/audio/11on.wav",
+            12: "Assets/audio/12on.wav",
         }
         if self.point_on:
             self.sound = pygame.mixer.Sound(self.on_sounds[self.roll_sum])
