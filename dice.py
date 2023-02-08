@@ -55,6 +55,7 @@ class DiceButton:
         text_rect = text_surface.get_rect()
         text_rect.center = self.rect.center
         screen.blit(text_surface, text_rect)
+        
         x, y = 10, 10
         for roll_num, roll in self.rolls_to_display.items():
             dice1_index, dice2_index = None, None
