@@ -314,7 +314,7 @@ class Dice:
         self.display = display
         self.dice_images = []
         self.rolling_images = []
-        
+        self.rolls_to_display = {}
         for i in range (1,9):
             self.rolling_image = pygame.image.load(f'Assets/animation/roll{i}.png')
             self.rolling_image = pygame.transform.scale(self.rolling_image, (screen_height*(1/7), screen_height*(1/7)))
@@ -329,13 +329,56 @@ class Dice:
         self.roll_data = {}
         self.roll_count = 0
 
+        self.point_value = None
+        self.point_on = False
+        self.puck_on = pygame.image.load('Assets/puck/puck_on.png')
+        self.puck_on = pygame.transform.scale(self.puck_on, (50,50))
+        self.puck_off = pygame.image.load('Assets/puck/puck_off.png')
+        self.puck_off = pygame.transform.scale(self.puck_off, (50,50))
+
+    def check_point(self):
+        if not self.point_on:
+            if self.check_results() in [4, 5, 6, 8, 9, 10]:
+                self.point_value = self.check_results()
+                self.point_on = True
+                print(f'the point is {self.point_value}')
+            else:
+                print('the point is off')
+        else:
+            if self.check_results() == 7 or self.check_results() == self.point_value:
+                self.point_on = False
+                self.point_value = None
+                print('Point is off')
+            else:
+                print(f'point is {self.point_value}')
+
+    def puck_movement(self, display):
+        if self.point_on == False:
+            display.blit(self.puck_off, (1158, 245))
+        elif self.point_on == True and self.point_value == 4:
+            display.blit(self.puck_on, (10, 345))
+        elif self.point_on == True and self.point_value == 5:
+            display.blit(self.puck_on, (200, 345))
+        elif self.point_on == True and self.point_value == 6:
+            display.blit(self.puck_on, (390, 345))
+        elif self.point_on == True and self.point_value == 8:
+            display.blit(self.puck_on, (580, 345))
+        elif self.point_on == True and self.point_value == 9:
+            display.blit(self.puck_on, (770, 345))
+        elif self.point_on == True and self.point_value == 10:
+            display.blit(self.puck_on, (960, 345))
+
+
     def roll_dice(self):
         self.roll_count += 1
         self.value1 = randint(1, 6)
         self.value2 = randint(1, 6)
         self.roll_history()
         self.roll_animation()
-        self.last_ten_rolls()
+        if self.roll_count > 10:
+            self.rolls_to_display = dict(list(self.roll_data.items())[-10:])
+        else:
+            self.rolls_to_display = self.roll_data
 
     def roll_history(self):
         self.roll_data[self.roll_count] = {"Dice 1":self.value1, "Dice 2":self.value2, "Total":self.check_results()}
@@ -355,7 +398,7 @@ class Dice:
 
     def last_ten_rolls(self):
         x, y = 10, 10
-        for num, roll in self.roll_data.items():
+        for num, roll in self.rolls_to_display.items():
             dice1_index, dice2_index = None, None
             if roll["Dice 1"] in range(1, 7):
                 dice1_index = int(roll["Dice 1"]) - 1
@@ -364,6 +407,12 @@ class Dice:
                 dice2_index = int(roll["Dice 2"]) - 1
                 self.display.blit(self.dice_images[dice2_index], (x, y+screen_height*(1/14)*.5))
             x += screen_height*(1/14)
+
+class Game:
+    def __init__(self) -> None:
+        pass
+
+
 
 def main():
     
@@ -378,10 +427,12 @@ def main():
     gui.buttons.append(roll_button)
     player = Player("Amir", 500)
 
+    betting_phase = True
+    betting_start_time = 0
+    shooting_phase = False
+    payout_phase = False
+
     running = True
-    betting = True
-    shooting = False
-    payouts = False
     
     while running:
         for event in pygame.event.get():
@@ -389,28 +440,22 @@ def main():
                 running = False
 
             elif event.type == pygame.MOUSEBUTTONUP:
-                pos = pygame.mouse.get_pos()
-                               
-                if betting == True:
+                pos = pygame.mouse.get_pos()               
+                if betting_phase:
                     player.select_chip(pos)
                     if event.button == 1:
                         player.place_bet(pos,gui.point_rect_dict)
                     elif event.button == 3:
                         player.remove_bet(pos, gui.point_rect_dict)
+                    betting_start_time = pygame.time.get_ticks()
+                    print(betting_start_time)
+                    
             
-                if shooting == True:
-                    for button in gui.buttons:
-                        if button.is_clicked(pygame.mouse.get_pos()):
-                            if button.text == "Roll":
-                                dice.roll_dice()
-                                betting, shooting = True, False
-                        
-                if payouts == True:
-                    pass
-
-
-
-
+                for button in gui.buttons:
+                    if button.is_clicked(pygame.mouse.get_pos()):
+                        if button.text == "Roll":
+                            dice.roll_dice()
+                            dice.check_point()
 
         # update display
         current_time = pygame.time.get_ticks()
@@ -418,6 +463,7 @@ def main():
         dice.last_ten_rolls()
         player.draw_chips(display)
         player.draw_bets(display, gui.point_rect_dict)
+        dice.puck_movement(display)
 
         pygame.display.update()
 
