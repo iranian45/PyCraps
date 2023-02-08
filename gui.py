@@ -409,64 +409,54 @@ class Dice:
             x += screen_height*(1/14)
 
 class Game:
-    def __init__(self) -> None:
-        pass
+    def __init__(self):
+        pygame.init()
+        self.display = pygame.display.set_mode((screen_width, screen_height))
+        pygame.display.set_caption('Craps')
+        self.clock = pygame.time.Clock()
 
+        self.gui = GUI(self.display)
+        self.dice = Dice(self.display)
 
+        self.roll_button = Button(1275, 775, 115, 115, "Roll", black, yellow, 40)
+        self.gui.buttons.append(self.roll_button)
 
-def main():
-    
-    pygame.init()
-    display = pygame.display.set_mode((screen_width, screen_height))
-    pygame.display.set_caption('Craps')
-    
-    gui = GUI(display)
-    dice = Dice(display)
+        self.running = True
+        self.player = Player("Amir", 500)   
+         
 
-    roll_button = Button(1275, 775, 115, 115, "Roll", black, yellow, 40)
-    gui.buttons.append(roll_button)
-    player = Player("Amir", 500)
+    def run(self):        
+        while self.running:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    self.running = False
 
-    betting_phase = True
-    betting_start_time = 0
-    shooting_phase = False
-    payout_phase = False
-
-    running = True
-    
-    while running:
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                running = False
-
-            elif event.type == pygame.MOUSEBUTTONUP:
-                pos = pygame.mouse.get_pos()               
-                if betting_phase:
-                    player.select_chip(pos)
+                elif event.type == pygame.MOUSEBUTTONUP:
+                    pos = pygame.mouse.get_pos()               
+                    self.player.select_chip(pos)
                     if event.button == 1:
-                        player.place_bet(pos,gui.point_rect_dict)
+                        self.player.place_bet(pos,self.gui.point_rect_dict)
                     elif event.button == 3:
-                        player.remove_bet(pos, gui.point_rect_dict)
-                    betting_start_time = pygame.time.get_ticks()
-                    print(betting_start_time)
-                    
-            
-                for button in gui.buttons:
-                    if button.is_clicked(pygame.mouse.get_pos()):
-                        if button.text == "Roll":
-                            dice.roll_dice()
-                            dice.check_point()
+                        self.player.remove_bet(pos, self.gui.point_rect_dict)
+                                      
+                    for button in self.gui.buttons:
+                        if button.is_clicked(pygame.mouse.get_pos()):
+                            if button.text == "Roll":
+                                self.dice.roll_dice()
+                                self.dice.check_point()
 
-        # update display
-        current_time = pygame.time.get_ticks()
-        gui.display_board()
-        dice.last_ten_rolls()
-        player.draw_chips(display)
-        player.draw_bets(display, gui.point_rect_dict)
-        dice.puck_movement(display)
+            # update display
+            current_time = pygame.time.get_ticks()
+            self.gui.display_board()
+            self.dice.last_ten_rolls()
+            self.player.draw_chips(self.display)
+            self.player.draw_bets(self.display, self.gui.point_rect_dict)
+            self.dice.puck_movement(self.display)
 
-        pygame.display.update()
+            pygame.display.update()
+
 
 if __name__ == "__main__":
-    main()
+    game = Game()
+    game.run()
 
