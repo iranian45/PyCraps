@@ -1081,7 +1081,7 @@ class Game:
                         current_time = pygame.time.get_ticks()
                         elapsed_time = (current_time-self.start_time) /1000
                         # print(elapsed_time)
-                        if elapsed_time >= 20:
+                        if elapsed_time >= 60:
                             print('shooting')
                             self.state = 'shooting'
                     
