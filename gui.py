@@ -1,33 +1,21 @@
 """
 Class 1: Player
--Attributes: name, chips, bets
--Methods: place_bet(), increase_bet(), collect_winnings(), update_chips()
+-Methods:collect_winnings()
 
 Class 2: Bet
--Attributes: amount, odds, payout, type
+-Attributes: table min/max, amount, odds, payout, type
 -Methods: calculate_payout()
-
-Class 3: Chip
--Attributes: value, color, location
--Methods: place_chip(), remove_chip()
-
-Class 4: Dice
--Attributes: value1, value2
--Methods: roll_dice(), check_result()
 
 Class 5: Game
 -Attributes: players, bets, dice, point
 -Methods: start_round(), end_round(), bet_phase(), payout_phase(), check_bets(), clear_bets()
 
 Class 6: GUI 
--Attributes: display, chips, buttons
--Methods: display_board(), display_chips(), display_bets(), display_dice(), display_message(), display_players()
+-Methods: display_bets(), display_message(), display_players()
 
 To Do:
-
-Add stages to game (Betting, Shooting, Payouts)
-Add Payout/Chip collection methods and update self.bets in player class to remove chips from accurate locations
-
+Add Payout/Chip collection methods
+update remove_bet method to remove full bet if selected chip is greater than the bet amount.
 """
 
 import pygame
@@ -73,6 +61,18 @@ class Button:
     def is_clicked(self, pos):
         return self.rect.collidepoint(pos)
     
+class Bet:
+    def __init__(self, dice):
+        self.bet_dict = {
+            'pass_line': {'odds': 1/1},
+            'do_not_pass': {'odds': 1/1}
+        }
+        self.dice = dice
+
+    def check_results(self):
+        if self.dice.point_on == False:
+            pass
+
 class GUI: 
     def __init__(self, display, width = screen_width, height = screen_height):
         self.display = display
@@ -210,9 +210,9 @@ class GUI:
         # Roll Button
         for button in self.buttons:
             button.draw(self.display)
-     
+        
 class Player:
-    def __init__(self, name, balance):
+    def __init__(self, name, balance, dice):
         self.name = name
         self.balance = balance
         self.chips = [Button(10, 830, 60, 60, '1', black, white, 30),
@@ -223,6 +223,7 @@ class Player:
         
         self.selected_chip = None
         self.bets = {}
+        self.dice = dice
 
     def draw_chips(self, display):
         for chip in self.chips:
@@ -287,14 +288,59 @@ class Player:
         if self.selected_chip is not None and self.balance >= self.selected_chip:
             for point, rect in point_rect_dict.items():
                 if rect.collidepoint(pos):
-                    self.balance -= self.selected_chip
-                    if point in self.bets:
-                        self.bets[point] += self.selected_chip
-                    else:
-                        self.bets[point] = self.selected_chip
-                    print(f"You placed a {self.selected_chip} bet on {point}. Your new balance is {self.balance},..{self.bets}")
-                    return self.bets
-    
+                    if point not in ['four_dont_come', 'four_blank', 'four_center', 'four_come',
+                        'five_dont_come', 'five_blank', 'five_center', 'five_come',
+                        'six_dont_come', 'six_blank', 'six_center','six_come',
+                        'eight_dont_come', 'eight_blank', 'eight_center', 'eight_come',
+                        'nine_dont_come', 'nine_blank', 'nine_center', 'nine_come',
+                        'ten_dont_come', 'ten_blank', 'ten_center', 'ten_come',]:
+
+                        come_odds = [
+                            ('four_come_odds', 'four_come'),
+                            ('five_come_odds', 'five_come'),
+                            ('six_come_odds', 'six_come'),
+                            ('eight_come_odds', 'eight_come'),
+                            ('nine_come_odds', 'nine_come'),
+                            ('ten_come_odds', 'ten_come'),
+                        ]
+
+                        dont_come_odds = [
+                            ('four_dont_come_odds', 'four_dont_come'),
+                            ('five_dont_come_odds', 'five_dont_come'),
+                            ('six_dont_come_odds', 'six_dont_come'),
+                            ('eight_dont_come_odds', 'eight_dont_come'),
+                            ('nine_dont_come_odds', 'nine_dont_come'),
+                            ('ten_dont_come_odds', 'ten_dont_come'),
+                        ]
+                        line_odds = [
+                            ('pass_line_odds', 'pass_line'),
+                            ('dont_pass_odds', 'dont_pass_line')
+                        ]
+
+                        for odds, req in come_odds + dont_come_odds + line_odds:
+                            if point == odds and req not in self.bets:
+                                return self.bets
+
+                        if self.dice.point_on == False:
+                            if point not in ['come', 'dont_come', 'pass_line_odds', 'dont_pass_odds']:
+                                self.balance -= self.selected_chip
+                                if point in self.bets:
+                                    self.bets[point] += self.selected_chip
+                                else:
+                                    self.bets[point] = self.selected_chip
+                                # print(f"You placed a {self.selected_chip} bet on {point}. Your new balance is {self.balance},..{self.bets}")
+                                return self.bets
+                            
+                        if self.dice.point_on:
+                            if point not in ['dont_pass_line']:
+                                self.balance -= self.selected_chip
+                                if point in self.bets:
+                                    self.bets[point] += self.selected_chip
+                                else:
+                                    self.bets[point] = self.selected_chip
+                                # print(f"You placed a {self.selected_chip} bet on {point}. Your new balance is {self.balance},..{self.bets}")
+                                return self.bets
+         
     def remove_bet(self, pos, point_rect_dict):
         if self.selected_chip is not None:
             for point, rect in point_rect_dict.items():
@@ -302,13 +348,602 @@ class Player:
                     if point in self.bets and self.selected_chip <= self.bets[point]:
                         self.balance += self.selected_chip
                         self.bets[point] -= self.selected_chip
-                        print(f"You removed a {self.selected_chip} bet on {point}. Your new balance is {self.balance},..{self.bets}")
+                        # print(f"You removed a {self.selected_chip} bet on {point}. Your new balance is {self.balance},..{self.bets}")
                     return self.bets
    
     def check_roll(self):
-        for point, bet in self.bet.items():
-            print(point)
+        self.roll_losses = 0
+        self.roll_winnings = 0
 
+        payouts = {}
+        for bet, amount in self.bets.items():
+            payouts[bet] = 0
+
+            if bet == 'hard_four':
+                # Win
+                if self.dice.value1 == 2 and self.dice.value2 == 2:
+                    payouts[bet] += amount * (7 / 1)
+                # Loss
+                elif self.dice.check_results() in [4, 7]:
+                    payouts[bet] -= amount
+                    self.bets[bet] = 0
+
+            if bet == 'hard_six':
+                # Win
+                if self.dice.value1 == 3 and self.dice.value2 == 3:
+                    payouts[bet] += amount * (9 / 1)
+                # Loss
+                elif self.dice.check_results() in [6, 7]:
+                    payouts[bet] -= amount
+                    self.bets[bet] = 0
+
+            if bet == 'hard_eight':
+                # Win
+                if self.dice.value1 == 4 and self.dice.value2 == 4:
+                    payouts[bet] += amount * (9 / 1)
+                # Loss
+                elif self.dice.check_results() in [8, 7]:
+                    payouts[bet] -= amount
+                    self.bets[bet] = 0
+
+            if bet == 'hard_ten':
+                # Win
+                if self.dice.value1 == 5 and self.dice.value2 == 5:
+                    payouts[bet] += amount * (7 / 1)
+                # Loss
+                elif self.dice.check_results() in [10, 7]:
+                    payouts[bet] -= amount
+                    self.bets[bet] = 0
+
+            if bet == 'any_seven':
+                # Win
+                if self.dice.check_results() == 7:
+                    payouts[bet] += amount * (4 / 1)
+                # Loss
+                else:
+                    payouts[bet] -= amount
+                    self.bets[bet] = 0
+            
+            if bet == 'any_craps':
+                # Win
+                if self.dice.check_results() in [2, 3, 12]:
+                    payouts[bet] += amount * (7 / 1)
+                # Loss
+                else:
+                    payouts[bet] -= amount
+                    self.bets[bet] = 0
+
+            if bet == 'horn_two':
+                # Win
+                if self.dice.check_results() == 2:
+                    payouts[bet] += amount * (30 / 1)
+                # Loss
+                else:
+                    payouts[bet] -= amount
+                    self.bets[bet] = 0
+
+            if bet == 'horn_three':
+                # Win
+                if self.dice.check_results() == 3:
+                    payouts[bet] += amount * (15 / 1)
+                # Loss
+                else:
+                    payouts[bet] -= amount
+                    self.bets[bet] = 0
+            
+            if bet == 'horn_eleven':
+                # Win
+                if self.dice.check_results() == 11:
+                    payouts[bet] += amount * (15 / 1)
+                # Loss
+                else:
+                    payouts[bet] -= amount
+                    self.bets[bet] = 0
+
+            if bet == 'horn_twelve':
+                # Win
+                if self.dice.check_results() == 12:
+                    payouts[bet] += amount * (30 / 1)
+                # Loss
+                else:
+                    payouts[bet] -= amount
+                    self.bets[bet] = 0
+
+            if bet == 'field':
+                # Win
+                if self.dice.check_results() in [2, 3, 4, 9, 10, 11, 12]:
+                    payouts[bet] += amount * (1 / 1)
+                # Loss
+                else:
+                    payouts[bet] -= amount
+                    self.bets[bet] = 0
+
+            if bet == 'come':
+                # Win
+                if self.dice.check_results() in [7, 11]:
+                    payouts[bet] += amount
+                # Loss
+                elif self.dice.check_results() in [2, 3, 12]:
+                    payouts[bet] -= amount
+                    self.bets[bet] = 0
+            
+            if bet == 'dont_come':
+                # Win
+                if self.dice.check_results() in [2, 3]:
+                    payouts[bet] += amount
+                # Loss
+                elif self.dice.check_results() in [7, 11]:
+                    payouts[bet] -= amount
+                    self.bets[bet] = 0
+            
+            if bet == 'dont_pass_line':
+                if self.dice.point_on == False:
+                    if self.dice.check_results() in [2, 3]:
+                        payouts[bet] += amount
+                    elif self.dice.check_results() in [7, 11]:
+                        payouts[bet] -= amount
+                        self.bets[bet] = 0
+                elif self.dice.point_on:
+                    if self.dice.check_results == 7:
+                        payouts[bet] += amount
+                    elif self.dice.point_value == self.dice.check_results():
+                        payouts[bet] -= amount
+                        self.bets[bet] = 0
+            
+            if bet == 'dont_pass_odds':   
+                if self.dice.check_results == 7:
+                    if self.dice.point_value in [4, 10]:
+                        payouts[bet] += amount * (1 / 2)
+                    if self.dice.point_value in [5, 9]:
+                        payouts[bet] += amount * (2 / 3)
+                    if self.dice.point_value in [6, 8]:
+                        payouts[bet] += amount * (5 / 6)
+                elif self.dice.point_value == self.dice.check_results():
+                    payouts[bet] -= amount
+                    self.bets[bet] = 0
+
+            if bet == 'pass_line':
+                if self.dice.point_on == False:
+                    if self.dice.check_results() in [7, 1]:
+                        payouts[bet] += amount
+                    elif self.dice.check_results() in [2, 3, 12]:
+                        payouts[bet] -= amount
+                        self.bets[bet] = 0
+                elif self.dice.point_on:
+                    if self.dice.check_results == 7:
+                        payouts[bet] -= amount
+                        self.bets[bet] = 0
+                    elif self.dice.point_value == self.dice.check_results():
+                        payouts[bet] += amount
+            
+            if bet == 'pass_line_odds':   
+                if self.dice.check_results == self.dice.check_results():
+                    if self.dice.point_value in [4, 10]:
+                        payouts[bet] += amount * (2 / 1)
+                    if self.dice.point_value in [5, 9]:
+                        payouts[bet] += amount * (3 / 2)
+                    if self.dice.point_value in [6, 8]:
+                        payouts[bet] += amount * (6 / 5)
+                elif self.dice.point_value == 7:
+                    payouts[bet] -= amount
+                    self.bets[bet] = 0
+
+            if bet == 'four_dont':
+                if self.dice.check_results() == 7:
+                    payouts[bet] += amount
+                elif self.dice.check_results() == 4:
+                    payouts[bet] -= amount
+                    self.bets[bet] = 0
+
+            if bet == 'four_dont_odds':
+                if self.dice.check_results() == 7:
+                    payouts[bet] += amount * (1 / 2)
+                elif self.dice.check_results() == 4:
+                    payouts[bet] -= amount
+                    self.bets[bet] = 0
+
+            if bet == 'four_lay':
+                if self.dice.check_results() == 7:
+                    payouts[bet] += (amount * (1 / 2)) - (amount * .05)
+                elif self.dice.check_results() == 4:
+                    payouts[bet] -= amount
+                    self.bets[bet] = 0
+            
+            if bet == 'four_come':
+                if self.dice.check_results() == 4:
+                    payouts[bet] += amount
+                elif self.dice.check_results() == 7:
+                    payouts[bet] -= amount
+                    self.bets[bet] = 0
+
+            if bet == 'four_come_odds':
+                if self.dice.check_results() == 4:
+                    payouts[bet] += amount * (2 / 1)
+                elif self.dice.check_results() == 7:
+                    payouts[bet] -= amount
+                    self.bets[bet] = 0
+
+            if bet == 'four_buy':
+                if self.dice.check_results() == 4:
+                    payouts[bet] += (amount * (2 / 1)) - (amount * .05)
+                elif self.dice.check_results() == 7:
+                    payouts[bet] -= amount
+                    self.bets[bet] = 0
+                
+            if bet == 'four_place':
+                if self.dice.check_results() == 4:
+                    payouts[bet] += amount * (9 / 5)
+                elif self.dice.check_results() == 7:
+                    payouts[bet] -= amount
+                    self.bets[bet] = 0
+
+            if bet == 'ten_dont':
+                if self.dice.check_results() == 7:
+                    payouts[bet] += amount
+                elif self.dice.check_results() == 10:
+                    payouts[bet] -= amount
+                    self.bets[bet] = 0
+
+            if bet == 'ten_dont_odds':
+                if self.dice.check_results() == 7:
+                    payouts[bet] += amount * (1 / 2)
+                elif self.dice.check_results() == 10:
+                    payouts[bet] -= amount
+                    self.bets[bet] = 0
+
+            if bet == 'ten_lay':
+                if self.dice.check_results() == 7:
+                    payouts[bet] += (amount * (1 / 2)) - (amount * .05)
+                elif self.dice.check_results() == 10:
+                    payouts[bet] -= amount
+                    self.bets[bet] = 0
+            
+            if bet == 'ten_come':
+                if self.dice.check_results() == 10:
+                    payouts[bet] += amount
+                elif self.dice.check_results() == 7:
+                    payouts[bet] -= amount
+                    self.bets[bet] = 0
+
+            if bet == 'ten_come_odds':
+                if self.dice.check_results() == 10:
+                    payouts[bet] += amount * (2 / 1)
+                elif self.dice.check_results() == 7:
+                    payouts[bet] -= amount
+                    self.bets[bet] = 0
+
+            if bet == 'ten_buy':
+                if self.dice.check_results() == 10:
+                    payouts[bet] += (amount * (2 / 1)) - (amount * .05)
+                elif self.dice.check_results() == 7:
+                    payouts[bet] -= amount
+                    self.bets[bet] = 0
+                
+            if bet == 'ten_place':
+                if self.dice.check_results() == 10:
+                    payouts[bet] += amount * (9 / 5)
+                elif self.dice.check_results() == 7:
+                    payouts[bet] -= amount
+                    self.bets[bet] = 0
+
+            if bet == 'five_dont':
+                if self.dice.check_results() == 7:
+                    payouts[bet] += amount
+                elif self.dice.check_results() == 5:
+                    payouts[bet] -= amount
+                    self.bets[bet] = 0
+
+            if bet == 'five_dont_odds':
+                if self.dice.check_results() == 7:
+                    payouts[bet] += amount * (2 / 3)
+                elif self.dice.check_results() == 5:
+                    payouts[bet] -= amount
+                    self.bets[bet] = 0
+
+            if bet == 'five_lay':
+                if self.dice.check_results() == 7:
+                    payouts[bet] += (amount * (2 / 3)) - (amount * .05)
+                elif self.dice.check_results() == 5:
+                    payouts[bet] -= amount
+                    self.bets[bet] = 0
+            
+            if bet == 'five_come':
+                if self.dice.check_results() == 5:
+                    payouts[bet] += amount
+                elif self.dice.check_results() == 7:
+                    payouts[bet] -= amount
+                    self.bets[bet] = 0
+
+            if bet == 'five_come_odds':
+                if self.dice.check_results() == 5:
+                    payouts[bet] += amount * (3 / 2)
+                elif self.dice.check_results() == 7:
+                    payouts[bet] -= amount
+                    self.bets[bet] = 0
+
+            if bet == 'five_buy':
+                if self.dice.check_results() == 5:
+                    payouts[bet] += (amount * (3 / 2)) - (amount * .05)
+                elif self.dice.check_results() == 7:
+                    payouts[bet] -= amount
+                    self.bets[bet] = 0
+                
+            if bet == 'five_place':
+                if self.dice.check_results() == 5:
+                    payouts[bet] += amount * (7 / 5)
+                elif self.dice.check_results() == 7:
+                    payouts[bet] -= amount
+                    self.bets[bet] = 0
+
+            if bet == 'nine_dont':
+                if self.dice.check_results() == 7:
+                    payouts[bet] += amount
+                elif self.dice.check_results() == 9:
+                    payouts[bet] -= amount
+                    self.bets[bet] = 0
+
+            if bet == 'nine_dont_odds':
+                if self.dice.check_results() == 7:
+                    payouts[bet] += amount * (2 / 3)
+                elif self.dice.check_results() == 9:
+                    payouts[bet] -= amount
+                    self.bets[bet] = 0
+
+            if bet == 'nine_lay':
+                if self.dice.check_results() == 7:
+                    payouts[bet] += (amount * (2 / 3)) - (amount * .05)
+                elif self.dice.check_results() == 9:
+                    payouts[bet] -= amount
+                    self.bets[bet] = 0
+            
+            if bet == 'nine_come':
+                if self.dice.check_results() == 9:
+                    payouts[bet] += amount
+                elif self.dice.check_results() == 7:
+                    payouts[bet] -= amount
+                    self.bets[bet] = 0
+
+            if bet == 'nine_come_odds':
+                if self.dice.check_results() == 9:
+                    payouts[bet] += amount * (3 / 2)
+                elif self.dice.check_results() == 7:
+                    payouts[bet] -= amount
+                    self.bets[bet] = 0
+
+            if bet == 'nine_buy':
+                if self.dice.check_results() == 9:
+                    payouts[bet] += (amount * (3 / 2)) - (amount * .05)
+                elif self.dice.check_results() == 7:
+                    payouts[bet] -= amount
+                    self.bets[bet] = 0
+                
+            if bet == 'nine_place':
+                if self.dice.check_results() == 9:
+                    payouts[bet] += amount * (7 / 5)
+                elif self.dice.check_results() == 7:
+                    payouts[bet] -= amount
+                    self.bets[bet] = 0
+
+            if bet == 'six_dont':
+                if self.dice.check_results() == 7:
+                    payouts[bet] += amount
+                elif self.dice.check_results() == 6:
+                    payouts[bet] -= amount
+                    self.bets[bet] = 0
+
+            if bet == 'six_dont_odds':
+                if self.dice.check_results() == 7:
+                    payouts[bet] += amount * (5 / 6)
+                elif self.dice.check_results() == 6:
+                    payouts[bet] -= amount
+                    self.bets[bet] = 0
+
+            if bet == 'six_lay':
+                if self.dice.check_results() == 7:
+                    payouts[bet] += (amount * (5 / 6)) - (amount * .05)
+                elif self.dice.check_results() == 6:
+                    payouts[bet] -= amount
+                    self.bets[bet] = 0
+            
+            if bet == 'six_come':
+                if self.dice.check_results() == 6:
+                    payouts[bet] += amount
+                elif self.dice.check_results() == 7:
+                    payouts[bet] -= amount
+                    self.bets[bet] = 0
+
+            if bet == 'six_come_odds':
+                if self.dice.check_results() == 6:
+                    payouts[bet] += amount * (6 / 5)
+                elif self.dice.check_results() == 7:
+                    payouts[bet] -= amount
+                    self.bets[bet] = 0
+
+            if bet == 'six_buy':
+                if self.dice.check_results() == 6:
+                    payouts[bet] += (amount * (6 / 5)) - (amount * .05)
+                elif self.dice.check_results() == 7:
+                    payouts[bet] -= amount
+                    self.bets[bet] = 0
+                
+            if bet == 'six_place':
+                if self.dice.check_results() == 6:
+                    payouts[bet] += amount * (7 / 6)
+                elif self.dice.check_results() == 7:
+                    payouts[bet] -= amount
+                    self.bets[bet] = 0            
+
+            if bet == 'eight_dont':
+                if self.dice.check_results() == 7:
+                    payouts[bet] += amount
+                elif self.dice.check_results() == 8:
+                    payouts[bet] -= amount
+                    self.bets[bet] = 0
+
+            if bet == 'eight_dont_odds':
+                if self.dice.check_results() == 7:
+                    payouts[bet] += amount * (5 / 6)
+                elif self.dice.check_results() == 8:
+                    payouts[bet] -= amount
+                    self.bets[bet] = 0
+
+            if bet == 'eight_lay':
+                if self.dice.check_results() == 7:
+                    payouts[bet] += (amount * (5 / 6)) - (amount * .05)
+                elif self.dice.check_results() == 8:
+                    payouts[bet] -= amount
+                    self.bets[bet] = 0
+            
+            if bet == 'eight_come':
+                if self.dice.check_results() == 8:
+                    payouts[bet] += amount
+                elif self.dice.check_results() == 7:
+                    payouts[bet] -= amount
+                    self.bets[bet] = 0
+
+            if bet == 'eight_come_odds':
+                if self.dice.check_results() == 8:
+                    payouts[bet] += amount * (6 / 5)
+                elif self.dice.check_results() == 7:
+                    payouts[bet] -= amount
+                    self.bets[bet] = 0
+
+            if bet == 'eight_buy':
+                if self.dice.check_results() == 8:
+                    payouts[bet] += (amount * (6 / 5)) - (amount * .05)
+                elif self.dice.check_results() == 8:
+                    payouts[bet] -= amount
+                    self.bets[bet] = 0
+                
+            if bet == 'eight_place':
+                if self.dice.check_results() == 8:
+                    payouts[bet] += amount * (7 / 6)
+                elif self.dice.check_results() == 7:
+                    payouts[bet] -= amount 
+                    self.bets[bet] = 0
+        self.roll_losses = sum(value for value in payouts.values() if value < 0)
+        self.roll_winnings = sum(value for value in payouts.values() if value > 0)
+        payouts = {k: v for k, v in payouts.items() if v != 0}
+        print(payouts)
+        print(f'Winnings: {self.roll_winnings} - Losses: {abs(self.roll_losses)} = {self.roll_winnings+self.roll_losses}')
+        return payouts,self.roll_losses, self.roll_winnings            
+            
+    def post_roll(self):
+        # Move Come Bets
+        if 'come' in self.bets:
+            if self.dice.check_results() == 4:
+                if 'four_come' in self.bets:
+                    self.bets['four_come'] += self.bets['come']
+                else:
+                    self.bets['four_come'] = self.bets['come']
+                del self.bets['come']
+            elif self.dice.check_results() == 5:
+                if 'five_come' in self.bets:
+                    self.bets['five_come'] += self.bets['come']
+                else:
+                    self.bets['five_come'] = self.bets['come']
+                del self.bets['come']
+            elif self.dice.check_results() == 6:
+                if 'six_come' in self.bets:
+                    self.bets['six_come'] += self.bets['come']
+                else:
+                    self.bets['six_come'] = self.bets['come']
+                del self.bets['come']
+            elif self.dice.check_results() == 8:
+                if 'eight_come' in self.bets:
+                    self.bets['eight_come'] += self.bets['come']
+                else:
+                    self.bets['eight_come'] = self.bets['come']
+                del self.bets['come']
+            elif self.dice.check_results() == 9:
+                if 'nine_come' in self.bets:
+                    self.bets['nine_come'] += self.bets['come']
+                else:
+                    self.bets['nine_come'] = self.bets['come']
+                del self.bets['come']
+            elif self.dice.check_results() == 10:
+                if 'ten_come' in self.bets:
+                    self.bets['ten_come'] += self.bets['come']
+                else:
+                    self.bets['ten_come'] = self.bets['come']    
+                del self.bets['come'] 
+        # Move Dont Come Bets
+        if 'dont_come' in self.bets:
+            if self.dice.check_results() == 4:
+                if 'four_dont_come' in self.bets:
+                    self.bets['four_dont_come'] += self.bets['dont_come']
+                else:
+                    self.bets['four_dont_come'] = self.bets['dont_come']
+                del self.bets['dont_come']
+            elif self.dice.check_results() == 5:
+                if 'five_dont_come' in self.bets:
+                    self.bets['five_dont_come'] += self.bets['dont_come']
+                else:
+                    self.bets['five_dont_come'] = self.bets['dont_come']
+                del self.bets['dont_come']
+            elif self.dice.check_results() == 6:
+                if 'six_dont_come' in self.bets:
+                    self.bets['six_dont_come'] += self.bets['dont_come']
+                else:
+                    self.bets['six_dont_come'] = self.bets['dont_come']
+                del self.bets['dont_come']
+            elif self.dice.check_results() == 8:
+                if 'eight_dont_come' in self.bets:
+                    self.bets['eight_dont_come'] += self.bets['dont_come']
+                else:
+                    self.bets['eight_dont_come'] = self.bets['dont_come']
+                del self.bets['dont_come']
+            elif self.dice.check_results() == 9:
+                if 'nine_dont_come' in self.bets:
+                    self.bets['nine_dont_come'] += self.bets['dont_come']
+                else:
+                    self.bets['nine_dont_come'] = self.bets['dont_come']
+                del self.bets['dont_come']
+            elif self.dice.check_results() == 10:
+                if 'ten_dont_come' in self.bets:
+                    self.bets['ten_dont_come'] += self.bets['dont_come']
+                else:
+                    self.bets['ten_dont_come'] = self.bets['dont_come']    
+                del self.bets['dont_come']
+        # Clear losses
+        self.bets = {k: v for k, v in self.bets.items() if v != 0}
+        # Pay winners
+        print(f'Previous Balance: {self.balance} + Wins/Losses {self.roll_winnings+self.roll_losses} = {self.balance+(self.roll_winnings+self.roll_losses)}')
+        self.balance += (self.roll_winnings)
+        
+    def display_account(self, display):
+        font = pygame.font.Font('Assets/font/ALGER.TTF', 30)
+
+        bets_text = font.render(str(round(sum(self.bets.values()),2)), True, black)
+        bets_text_rect = bets_text.get_rect()
+        bets_text_rect.right = 1390
+        bets_text_rect.top = 10
+        display.blit(bets_text, bets_text_rect)
+
+        bets_label = font.render('My Bets: ', True, black)
+        bets_label_rect = bets_label.get_rect()
+        bets_label_rect.top = bets_text_rect.top
+        bets_label_rect.right = bets_text_rect.left
+        display.blit(bets_label, bets_label_rect)
+        
+        balance_text = font.render(str(round(self.balance,2)),True, black)
+        balance_text_rect = balance_text.get_rect()
+        balance_text_rect.topright = bets_text_rect.bottomright
+        display.blit(balance_text, balance_text_rect)
+        
+        balance_label = font.render('Balance: ', True, black)
+        balance_label_rect = balance_label.get_rect()
+        balance_label_rect.bottomright = balance_text_rect.bottomleft
+        display.blit(balance_label, balance_label_rect)
+
+        pygame.draw.line(display, white, balance_label_rect.topleft, bets_text_rect.bottomright, 1)
+        
+
+        
+
+
+
+        
 class Dice:
     def __init__(self, display):
         self.display = display
@@ -341,16 +976,18 @@ class Dice:
             if self.check_results() in [4, 5, 6, 8, 9, 10]:
                 self.point_value = self.check_results()
                 self.point_on = True
-                print(f'the point is {self.point_value}')
+                # print(f'the point is {self.point_value}')
             else:
-                print('the point is off')
+                pass
+                # print('the point is off')
         else:
             if self.check_results() == 7 or self.check_results() == self.point_value:
                 self.point_on = False
                 self.point_value = None
-                print('Point is off')
+                # print('Point is off')
             else:
-                print(f'point is {self.point_value}')
+                pass
+                # print(f'point is {self.point_value}')
 
     def puck_movement(self, display):
         if self.point_on == False:
@@ -379,10 +1016,11 @@ class Dice:
             self.rolls_to_display = dict(list(self.roll_data.items())[-10:])
         else:
             self.rolls_to_display = self.roll_data
+        print(self.value1+self.value2)
 
     def roll_history(self):
         self.roll_data[self.roll_count] = {"Dice 1":self.value1, "Dice 2":self.value2, "Total":self.check_results()}
-        print(self.roll_data)
+        # print(self.roll_data)
 
     def check_results(self):
         total = self.value1 + self.value2
@@ -408,6 +1046,8 @@ class Dice:
                 self.display.blit(self.dice_images[dice2_index], (x, y+screen_height*(1/14)*.5))
             x += screen_height*(1/14)
 
+    
+
 class Game:
     def __init__(self):
         pygame.init()
@@ -422,8 +1062,11 @@ class Game:
         self.gui.buttons.append(self.roll_button)
 
         self.running = True
-        self.player = Player("Amir", 500)   
-         
+        self.player = Player("Amir", 500, self.dice)   
+
+        self.state = 'betting'
+        self.time_status = 'start'
+        self.start_time = 0
 
     def run(self):        
         while self.running:
@@ -431,19 +1074,39 @@ class Game:
                 if event.type == pygame.QUIT:
                     self.running = False
 
-                elif event.type == pygame.MOUSEBUTTONUP:
-                    pos = pygame.mouse.get_pos()               
-                    self.player.select_chip(pos)
-                    if event.button == 1:
-                        self.player.place_bet(pos,self.gui.point_rect_dict)
-                    elif event.button == 3:
-                        self.player.remove_bet(pos, self.gui.point_rect_dict)
-                                      
-                    for button in self.gui.buttons:
-                        if button.is_clicked(pygame.mouse.get_pos()):
-                            if button.text == "Roll":
-                                self.dice.roll_dice()
-                                self.dice.check_point()
+                if self.state == 'betting':
+                    if event.type == pygame.MOUSEBUTTONUP:
+                        pos = pygame.mouse.get_pos()               
+                        self.player.select_chip(pos)
+                        if event.button == 1:
+                            self.player.place_bet(pos,self.gui.point_rect_dict)
+                        elif event.button == 3:
+                            self.player.remove_bet(pos, self.gui.point_rect_dict)
+                    if self.time_status == 'start':
+                        self.start_time = pygame.time.get_ticks()
+                        self.time_status = 'stop'
+                    if self.time_status == 'stop':
+                        current_time = pygame.time.get_ticks()
+                        elapsed_time = (current_time-self.start_time) /1000
+                        # print(elapsed_time)
+                        if elapsed_time >= 20:
+                            print('shooting')
+                            self.state = 'shooting'
+                    
+                elif self.state in 'shooting':                      
+                    if event.type == pygame.MOUSEBUTTONUP:
+                        pos = pygame.mouse.get_pos()   
+                        for button in self.gui.buttons:
+                            if button.is_clicked(pygame.mouse.get_pos()):
+                                if button.text == "Roll":
+                                    self.state = 'betting'
+                                    self.start_time = pygame.time.get_ticks()
+                                    self.dice.roll_dice()
+                                    self.player.check_roll()
+                                    self.dice.check_point()
+                                    self.player.post_roll()
+                                    print('betting')
+                                    
 
             # update display
             current_time = pygame.time.get_ticks()
@@ -452,9 +1115,9 @@ class Game:
             self.player.draw_chips(self.display)
             self.player.draw_bets(self.display, self.gui.point_rect_dict)
             self.dice.puck_movement(self.display)
+            self.player.display_account(self.display)
 
             pygame.display.update()
-
 
 if __name__ == "__main__":
     game = Game()
