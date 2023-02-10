@@ -8,6 +8,8 @@ add settings/menu pages
 Add Audio
 Add Multiplayer support
 Add Dice input for physical rolls
+add button to bypass bet timer
+add hop bets like c/e
 """
 
 import pygame
@@ -53,18 +55,6 @@ class Button:
     def is_clicked(self, pos):
         return self.rect.collidepoint(pos)
     
-class Bet:
-    def __init__(self, dice):
-        self.bet_dict = {
-            'pass_line': {'odds': 1/1},
-            'do_not_pass': {'odds': 1/1}
-        }
-        self.dice = dice
-
-    def check_results(self):
-        if self.dice.point_on == False:
-            pass
-
 class GUI: 
     def __init__(self, display, width = screen_width, height = screen_height):
         self.display = display
@@ -929,13 +919,7 @@ class Player:
         display.blit(balance_label, balance_label_rect)
 
         pygame.draw.line(display, white, balance_label_rect.topleft, bets_text_rect.bottomright, 1)
-        
-
-        
-
-
-
-        
+          
 class Dice:
     def __init__(self, display):
         self.display = display
@@ -997,7 +981,6 @@ class Dice:
         elif self.point_on == True and self.point_value == 10:
             display.blit(self.puck_on, (960, 345))
 
-
     def roll_dice(self):
         self.roll_count += 1
         self.value1 = randint(1, 6)
@@ -1037,9 +1020,7 @@ class Dice:
                 dice2_index = int(roll["Dice 2"]) - 1
                 self.display.blit(self.dice_images[dice2_index], (x, y+screen_height*(1/14)*.5))
             x += screen_height*(1/14)
-
-    
-
+   
 class Game:
     def __init__(self):
         pygame.init()
