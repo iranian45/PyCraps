@@ -1,21 +1,13 @@
 """
-Class 1: Player
--Methods:collect_winnings()
-
-Class 2: Bet
--Attributes: table min/max, amount, odds, payout, type
--Methods: calculate_payout()
-
-Class 5: Game
--Attributes: players, bets, dice, point
--Methods: start_round(), end_round(), bet_phase(), payout_phase(), check_bets(), clear_bets()
-
-Class 6: GUI 
--Methods: display_bets(), display_message(), display_players()
-
 To Do:
 Add Payout/Chip collection methods
 update remove_bet method to remove full bet if selected chip is greater than the bet amount.
+lock in contract bets when applicable
+add more stats and UI items
+add settings/menu pages
+Add Audio
+Add Multiplayer support
+Add Dice input for physical rolls
 """
 
 import pygame
