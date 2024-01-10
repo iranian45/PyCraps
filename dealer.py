@@ -4,3 +4,5 @@ class Dealer:
         # TO DO ::: Set dealer up to be able to modify settings in game like Min/Max Bets, betting time limits, rolling time limits
         # TO DO ::: Set dealer up to be able to turn off dice button and manually input dice rolls when rolling real dice.
         pass 
+
+    #111
