@@ -8,7 +8,6 @@ add settings/menu pages
 Add Audio
 Add Multiplayer support
 Add Dice input for physical rolls
-add button to bypass bet timer
 add hop bets like c/e
 """
 
@@ -1019,8 +1018,8 @@ class Dice:
             if roll["Dice 2"] in range (1, 7):
                 dice2_index = int(roll["Dice 2"]) - 1
                 self.display.blit(self.dice_images[dice2_index], (x, y+screen_height*(1/14)*.5))
-            x += screen_height*(1/14)
-   
+            x += screen_height*(1/14)               
+
 class Game:
     def __init__(self):
         pygame.init()
@@ -1032,7 +1031,9 @@ class Game:
         self.dice = Dice(self.display)
 
         self.roll_button = Button(1275, 775, 115, 115, "Roll", black, yellow, 40)
+        self.ready_button = Button(1210, 810, 60, 60, "Ready", yellow, black, 20)
         self.gui.buttons.append(self.roll_button)
+        self.gui.buttons.append(self.ready_button)
 
         self.running = True
         self.player = Player("Amir", 500, self.dice)   
@@ -1065,6 +1066,8 @@ class Game:
                         if elapsed_time >= 60:
                             print('shooting')
                             self.state = 'shooting'
+                        elif self.ready_button.is_clicked(pygame.mouse.get_pos()):
+                            self.state = 'shooting'
                     
                 elif self.state in 'shooting':                      
                     if event.type == pygame.MOUSEBUTTONUP:
@@ -1089,7 +1092,6 @@ class Game:
             self.player.draw_bets(self.display, self.gui.point_rect_dict)
             self.dice.puck_movement(self.display)
             self.player.display_account(self.display)
-
             pygame.display.update()
 
 if __name__ == "__main__":
